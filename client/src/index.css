@@ -1,0 +1,28 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+body {
+  background-color: whitesmoke !important;
+}
+
+a {
+  font-weight: 500;
+  text-decoration: inherit;
+  color: inherit;
+}
+
+.active {
+  color: white;
+  background-color: orange;
+}
+
+.done {
+  color: gray;
+  text-decoration: line-through;
+}
+
+.scroll {
+  height: 90vh;
+  overflow-y: scroll;
+}
