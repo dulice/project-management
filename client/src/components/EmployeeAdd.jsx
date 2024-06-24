@@ -43,12 +43,12 @@ const EmployeeAdd = ({ openModal, setOpenModal }) => {
     setPhoto(URL.createObjectURL(file));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if(name === "" || email === "" || position === "" || password=== "") {
         return toast.error("Please fill all the field")
     }
-    addUser(name, email, file, position, password);
+    await addUser(name, email, file, position, password);
     setName("");
     setEmail("");
     setPosition("");

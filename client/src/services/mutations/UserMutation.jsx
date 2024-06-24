@@ -21,8 +21,8 @@ const UPDATE_USER = gql`
 `
 
 const DELETE_USER = gql`
-    mutation deleteUser($id: ID, $publicId: String) {
-        deleteUser(id: $id, publicId: $publicId) {
+    mutation deleteUser($id: ID ) {
+        deleteUser(id: $id) {
             id
         }
     }

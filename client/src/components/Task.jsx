@@ -3,6 +3,7 @@ import {
   CheckCircle,
   CheckCircleOutline,
   DeleteForever,
+  Edit,
 } from "@mui/icons-material";
 import {
   Avatar,
@@ -14,27 +15,31 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 import { DELETE_TASK } from "../services/mutations";
 import { TASKS } from "../services/queries";
+import ConfirmationModal from "./ConfirmationModal";
+import TaskUpdate from "./TaskUpdate";
 
 const Task = ({ task }) => {
+  const [confirmModal, setConfirmModal] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
   const [deleteTask] = useMutation(DELETE_TASK, {
     variables: { id: task.id },
     update: (cache, { data: { deleteTask } }) => {
-      const { tasks } = cache.readQuery({query: TASKS});
+      const { tasks } = cache.readQuery({ query: TASKS });
       cache.writeQuery({
         query: TASKS,
         data: {
-          tasks: tasks.filter(el => el.id !== deleteTask.id)
-        }
-      })
+          tasks: tasks.filter((el) => el.id !== deleteTask.id),
+        },
+      });
     },
   });
   return (
     <>
       <TableRow>
-        <TableCell sx={{ width: "100%", whiteSpace: "nowrap" }}>
+        <TableCell sx={{ whiteSpace: "nowrap" }}>
           <FormControlLabel
             checked={task.isDone}
             control={
@@ -52,7 +57,7 @@ const Task = ({ task }) => {
             component="span"
             sx={{ display: "flex", alignItems: "center", gap: 1 }}
           >
-            <Avatar src={task.user.photo} alt="" component="span" />
+            <Avatar src={task.user.photo} alt="" />
             <Typography variant="caption" sx={{ fontWeight: "bold" }}>
               {task.user.name}
             </Typography>
@@ -63,16 +68,26 @@ const Task = ({ task }) => {
             component="span"
             sx={{ display: "flex", alignItems: "center", gap: 1 }}
           >
-            <Avatar src={task.project.image} alt="" component="span" />
+            <Avatar src={task.project.image} alt="" />
             <Typography variant="body2">{task.project.title}</Typography>
           </Box>
         </TableCell>
         <TableCell>
-          <IconButton onClick={deleteTask} color="error">
+          <IconButton variant="outlined" onClick={() => setOpenModal(true)} color="success">
+            <Edit />
+          </IconButton>
+          <IconButton onClick={() => setConfirmModal(true)} color="error">
             <DeleteForever />
           </IconButton>
         </TableCell>
       </TableRow>
+      <ConfirmationModal
+        open={confirmModal}
+        handleClose={() => setConfirmModal(false)}
+        handleDelete={deleteTask}
+        title="task"
+      />
+      <TaskUpdate openModal={openModal} setOpenModal={setOpenModal} task={task}/>
     </>
   );
 };

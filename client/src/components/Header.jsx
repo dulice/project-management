@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import {
   AppBar,
   Avatar,
-  Box,
   IconButton,
   InputBase,
   Menu,

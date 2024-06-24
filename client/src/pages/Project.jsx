@@ -26,6 +26,9 @@ import {
   TableCell,
   TableHead,
   Stack,
+  IconButton,
+  Container,
+  Fab,
 } from "@mui/material";
 import { green } from "@mui/material/colors";
 import { getRandomNumber } from "../components/ProjectCard";
@@ -36,19 +39,21 @@ import {
   Add,
   Edit,
   Delete,
+  ArrowBack,
 } from "@mui/icons-material";
 import { DELETE_IMAGE, DELETE_PROJECT } from "../services/mutations";
+import ConfirmationModal from "../components/ConfirmationModal";
 
 const Project = () => {
   const [openModal, setOpenModal] = useState(false);
+  const [confirmModal, setConfirmModal] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const { id } = useParams();
   const navigate = useNavigate();
   const [deleteProject] = useMutation(DELETE_PROJECT);
   const [deleteImage] = useMutation(DELETE_IMAGE);
   const { data, loading, error } = useQuery(PROJECT, { variables: { id } });
-
-  const handleDeleteProject = (publicId) => {
+  const handleDeleteProject = () => {
     deleteProject({
       variables: { id },
       update: (cache, { data: { deleteProject } }) => {
@@ -63,9 +68,9 @@ const Project = () => {
         });
       },
     });
-    if (publicId) {
+    if (data.project?.publicId) {
       deleteImage({
-        variables: { publicId },
+        variables: { publicId: data.project.publicId },
       });
     }
     navigate("/projects");
@@ -77,39 +82,37 @@ const Project = () => {
       {isEdit ? (
         <ProjectEdit project={data.project} setIsEdit={setIsEdit} />
       ) : (
-        <Box>
-          <Box sx={{ float: "right" }}>
+        <Container>
+          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+            <IconButton onClick={() => navigate(-1)}>
+              <ArrowBack />
+            </IconButton>
             <Stack spacing={1} direction="row">
-              <Button
-                onClick={() => setIsEdit(true)}
-                variant="contained"
-                color="success"
-                sx={{ borderRadius: "50%", minWidth: "20px", padding: 1 }}
-              >
+              <Fab onClick={() => setIsEdit(true)} color="success" size="small">
                 <Edit />
-              </Button>
-              <Button
-                onClick={() => handleDeleteProject(data.project?.publicId)}
-                variant="outlined"
+              </Fab>
+              <Fab
+                onClick={() => setConfirmModal(true)}
+                size="small"
                 color="error"
-                sx={{ borderRadius: "50%", minWidth: "20px", padding: 1 }}
               >
                 <Delete />
-              </Button>
-              <Button
-                onClick={() => setOpenModal(true)}
-                variant="contained"
-                color="warning"
-                sx={{ borderRadius: "50%", minWidth: "20px", padding: 1 }}
-              >
+              </Fab>
+              <Fab onClick={() => setOpenModal(true)} color="warning" size="small">
                 <Add />
-              </Button>
+              </Fab>
             </Stack>
           </Box>
           <TaskAdd
             openModal={openModal}
             setOpenModal={setOpenModal}
             project={data.project}
+          />
+          <ConfirmationModal
+            open={confirmModal}
+            handleClose={() => setConfirmModal(false)}
+            handleDelete={() => handleDeleteProject()}
+            title="project"
           />
           <Grid container spacing={3}>
             <Grid item xs={12} md={7}>
@@ -205,7 +208,7 @@ const Project = () => {
               </TableContainer>
             </Grid>
           </Grid>
-        </Box>
+        </Container>
       )}
     </>
   );

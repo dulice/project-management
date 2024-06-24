@@ -14,19 +14,19 @@ const Projects = () => {
   if (error) return <Error />;
   return (
     <>
-      <Box sx={{float: "right"}}>
+      <Box sx={{ float: "right" }}>
         <Link to="/projectAdd">
-          <Avatar sx={{bgcolor: orange[500]}}><Add /></Avatar>
+          <Avatar sx={{ bgcolor: orange[500] }}>
+            <Add />
+          </Avatar>
         </Link>
       </Box>
       <Grid container spacing={3}>
-        {!loading &&
-          !error &&
-          data.projects.map((project) => (
-            <Grid key={project.id} item xs={12} sm={6} md={4}>
-              <ProjectCard project={project} />
-            </Grid>
-          ))}
+        {data.projects.map((project) => (
+          <Grid key={project.id} item xs={12} sm={6} md={4}>
+            <ProjectCard project={project} />
+          </Grid>
+        ))}
       </Grid>
     </>
   );

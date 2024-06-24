@@ -26,7 +26,7 @@ const CalendarPage = () => {
 
     while (currentDate.isSameOrBefore(endDate)) {
       if (currentDate.day() === 5) { // Friday (0 is Sunday, 1 is Monday, and so on)
-        const eventStartDate = moment(currentDate).set({ hour: 9, minute: 0 }).toDate();
+        const eventStartDate = moment(currentDate).set({ hour: 9 }).toDate();
         const eventEndDate = moment(currentDate).set({ hour: 9, minute: 30 }).toDate();
         recurringEvents.push({
           title: 'Meeting',
@@ -52,7 +52,7 @@ const CalendarPage = () => {
         defaultView="month"
         events={[...recurringEvents, ...eventsData]}
         style={{ height: "80vh"}}
-        onSelectEvent={(event) => alert(event.title)}
+        onSelectEvent={(event) => alert(`${event.title} from ${event.start.toLocaleTimeString()} to ${event.end.toLocaleTimeString()}`)}
         onSelectSlot={handleSelect}
       />
     </Box>

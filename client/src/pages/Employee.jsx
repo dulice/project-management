@@ -14,7 +14,6 @@ import {
   TableHead,
   TablePagination,
   TableRow,
-  Typography,
 } from "@mui/material";
 import { Add } from "@mui/icons-material";
 
@@ -55,7 +54,7 @@ export default function Employee() {
           <TableHead>
             <TableRow>
               {columns.map((column, index) => (
-                <TableCell key={index}>{column}</TableCell>
+                <TableCell sx={{fontWeight: "bold"}} key={index}>{column}</TableCell>
               ))}
             </TableRow>
           </TableHead>

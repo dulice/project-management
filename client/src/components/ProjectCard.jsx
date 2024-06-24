@@ -37,8 +37,8 @@ const ProjectCard = ({ project }) => {
               </IconButton>
             </Link>
           </Box>
-         <Chip label={project.status} sx={{mb: 3, mt: 1, color: green[500]}}/>
-          <Typography paragraph sx={{lineHeight: "1.5rem", height: "3rem", overflow: "hidden"}}>{project.description}...</Typography>
+         <Chip label={project.status} sx={{mb: 3, mt: 1, color: green[700]}}/>
+          <Typography paragraph sx={{lineHeight: "1.5rem", height: "3rem", overflow: "hidden", textOverflow: "ellipsis"}}>{project.description}</Typography>
           <DoneProgress tasks={project.tasks} />
           <Box>
             {project.languages.map((language, index) => (

@@ -12,9 +12,10 @@ import { useMutation } from "@apollo/client";
 import { UPDATE_TASK } from "../services/mutations";
 
 const MyTask = ({ task, index }) => {
-  const [isChecked, setIsChecked] = useState(task.isDone);
+  const { id, name, isDone} = task;
+  const [isChecked, setIsChecked] = useState(isDone);
   const [updateTask] = useMutation(UPDATE_TASK, {
-    variables: { id: task.id, isDone: isChecked },
+    variables: { id, name, isDone: !isChecked },
     update: (cache, { data: { updateTask } }) => {
       cache.modify({
         id: cache.identify(updateTask),
@@ -28,8 +29,7 @@ const MyTask = ({ task, index }) => {
   const handleUpdate = (e) => {
     e.preventDefault();
     setIsChecked(!isChecked);
-    console.log(isChecked);
-    updateTask(isChecked);
+    updateTask();
   };
 
   return (
@@ -48,11 +48,11 @@ const MyTask = ({ task, index }) => {
                     checkedIcon={<CheckCircle color="warning" />}
                   />
                 }
-                checked={task.isDone}
+                checked={isChecked}
                 onChange={handleUpdate}
-                label={task.name}
+                label={name}
                 labelPlacement="start"
-                className={`${task.isDone && "done"}`}
+                className={`${isChecked && "done"}`}
               />
             </TableCell>
           </TableRow>

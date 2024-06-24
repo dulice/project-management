@@ -11,6 +11,12 @@ import {
   TableRow,
 } from "@mui/material";
 
+const columns = [
+  "# Task Name",
+  "Task Assign Name",
+  "Working On Project",
+  "Action",
+];
 
 const Tasks = () => {
   const { data, loading, error } = useQuery(TASKS);
@@ -19,23 +25,24 @@ const Tasks = () => {
   return (
     <>
       <Box>
-        <TableContainer>
-          <Table>
+        <TableContainer sx={{ maxHeight: 490 }}>
+          <Table stickyHeader>
             <TableHead>
               <TableRow>
-                <TableCell># Task Name</TableCell>
-                <TableCell sx={{ whiteSpace: "nowrap" }}>
-                  Task Assign Name
-                </TableCell>
-                <TableCell sx={{ whiteSpace: "nowrap" }}>
-                  Working On Project
-                </TableCell>
+                {columns.map((column, index) => (
+                  <TableCell
+                    key={index}
+                    sx={{ whiteSpace: "nowrap", fontWeight: "bold" }}
+                  >
+                    {column}
+                  </TableCell>
+                ))}
               </TableRow>
             </TableHead>
             <TableBody>
-              {!loading &&
-                !error &&
-                data.tasks.map((task) => <Task task={task} key={task.id} />)}
+              {data.tasks.map((task) => (
+                <Task task={task} key={task.id} />
+              ))}
             </TableBody>
           </Table>
         </TableContainer>

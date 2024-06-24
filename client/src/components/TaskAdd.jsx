@@ -26,34 +26,40 @@ import { toast } from "react-toastify";
 const TaskAdd = ({ openModal, setOpenModal, project }) => {
   const [name, setName] = useState("");
   const [userId, setUserId] = useState("");
-
   const [addTask] = useMutation(ADD_TASK, {
-    variables: { name, userId, projectId: project.id },
-    update(cache, {data: { addTask }}) {
-        const { tasks } = cache.readQuery({query: TASKS, variables: {name, userId}});
-        cache.writeQuery({
-            query: TASKS,
-            data: {tasks: [addTask, ...tasks]},            
-        });
-        const readProject  = cache.readQuery({query: PROJECT, variables: {id: project.id}});
-        cache.writeQuery({
-          query: PROJECT,
-          data: {
-            project: {
-              ...readProject.project,
-              tasks: [addTask, ...readProject.project.tasks ]
-            }
-          }
-        })
-    }
+    variables: {name, userId, projectId: project.id},
+    refetchQueries: [PROJECT, 'Project']
   })
+
+  // const [addTask] = useMutation(ADD_TASK, {
+  //   variables: { name, userId, projectId: project.id },
+  //   update(cache, {data: { addTask }}) {
+  //       const { tasks } = cache.readQuery({query: TASKS, variables: {projectId: project.id}});
+  //       cache.writeQuery({
+  //           query: TASKS,
+  //           variables: {projectId: project.id},
+  //           data: {tasks: [addTask, ...tasks]},            
+  //       });
+  //       const readProject  = cache.readQuery({query: PROJECT, variables: {id: project.id}});
+  //       cache.writeQuery({
+  //         query: PROJECT,
+  //         variables: {id: project.id},
+  //         data: {
+  //           project: {
+  //             ...readProject.project,
+  //             tasks: [addTask, ...readProject.project.tasks ]
+  //           }
+  //         }
+  //       })
+  //   }
+  // })
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if(name === "" || userId === "") {
         return toast.error("Please fill all the field")
     }
-    addTask(name, userId);
+    addTask();
     setName("");
     setUserId("");
     setOpenModal(false);
@@ -61,12 +67,9 @@ const TaskAdd = ({ openModal, setOpenModal, project }) => {
 
   return (
     <>
-      <Dialog open={openModal} onClose={() => setOpenModal(false)}>
+      <Dialog open={openModal} onClose={() => setOpenModal(false)} maxWidth="sm" fullWidth>
         <Paper component="form" onSubmit={handleSubmit}>
-          <DialogContent>
-            <DialogContentText sx={{ opacity: 0 }}>
-              To subscribe to this website, please enter your email address here
-            </DialogContentText>
+          <DialogContent>    
             <Stack spacing={3}>
               <TextField
                 label="Name"

@@ -5,6 +5,7 @@ import {
   Button,
   Chip,
   FormControl,
+  IconButton,
   InputLabel,
   MenuItem,
   OutlinedInput,
@@ -14,10 +15,10 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { AddAPhoto, AddSharp, Edit } from '@mui/icons-material'
+import { AddAPhoto, ArrowBack, Edit } from '@mui/icons-material'
 import { useMutation, useQuery } from "@apollo/client";
-import { GET_PROJECTS, USERS } from "../services/queries";
-import { ADD_PROJECT, DELETE_IMAGE, UPDATE_PROJECT } from "../services/mutations";
+import { USERS } from "../services/queries";
+import { DELETE_IMAGE, UPDATE_PROJECT } from "../services/mutations";
 import { Error, Loading } from ".";
 import { toast } from "react-toastify";
 
@@ -39,7 +40,6 @@ export const MenuProps = {
 };
 
 const ProjectEdit = ({project, setIsEdit}) => {
-
   const previousMembersId = project.members.map(member => member.id);
   const previousStatus = statusData.find(status => status.name === project.status);
 
@@ -55,7 +55,7 @@ const ProjectEdit = ({project, setIsEdit}) => {
   const { data: users, loading, error } = useQuery(USERS);
   const [deleteImage] = useMutation(DELETE_IMAGE);
   const [updateProject] = useMutation(UPDATE_PROJECT, {
-    variables: { id: project.id, title, description, languages, status, membersId, image: file },
+    variables: { id: project.id, title, description, languages, status, membersId, image: file ?? image },
     update(cache, {data: { updateProject }}) {
         cache.modify({
           id: cache.identify(updateProject),
@@ -111,6 +111,9 @@ const ProjectEdit = ({project, setIsEdit}) => {
   return (
     <>
       <Box>
+        <IconButton onClick={() => setIsEdit(false)}>
+          <ArrowBack />
+        </IconButton>
         <Paper
           component="form"
           sx={{ m: 1, display: "flex", flexDirection: "column", gap: 3, p: 3 }}

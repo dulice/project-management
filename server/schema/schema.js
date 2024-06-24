@@ -78,29 +78,39 @@ const rootMutation = new GraphQLObjectType({
         position: { type: GraphQLString },
       },
       resolve: async (parent, args) => {
-
-        const { createReadStream } = await args.photo.file;
-        const uploadResult = await new Promise((resolve, reject) => {
-            const stream = cloudinary.uploader.upload_stream({ folder: 'project-management/user' }, (error, result) => {
-              if (error) {
-                reject(error);
-              } else {
-                resolve(result);
-              }
-            });
-            createReadStream().pipe(stream);
-          });
         const salt = await bcrypt.genSalt(10);
         const password = await bcrypt.hash(args.password, salt);
-        const user = new User({
-          name: args.name,
-          email: args.email,
-          password,
-          position: args.position,
-          photo: uploadResult.secure_url,
-          publicId: uploadResult.public_id
-        });
-        return user.save();
+        if(args.photo) {
+          const { createReadStream } = await args.photo.file;
+          const uploadResult = await new Promise((resolve, reject) => {
+              const stream = cloudinary.uploader.upload_stream({ folder: 'project-management/user' }, (error, result) => {
+                if (error) {
+                  reject(error);
+                } else {
+                  resolve(result);
+                }
+              });
+              createReadStream().pipe(stream);
+            });
+            const user = new User({
+              name: args.name,
+              email: args.email,
+              password,
+              position: args.position,
+              photo: uploadResult.secure_url,
+              publicId: uploadResult.public_id
+            });
+            return user.save();
+        } else {
+          const user = new User({
+            name: args.name,
+            email: args.email,
+            password,
+            position: args.position,
+          });
+          return user.save();
+        }
+        
       },
     },
     signInUser: {
@@ -114,9 +124,7 @@ const rootMutation = new GraphQLObjectType({
           const userExist = await User.findById(args.id);
           console.log(userExist)
           const comparePassword = bcrypt.compareSync(args.password, userExist.password);
-          if(!userExist) {
-            throw Error("Wrong Credentails")
-          } else if (!comparePassword) {
+          if(!userExist || !comparePassword) {
             throw Error("Wrong Credentails")
           } else {
             return userExist
@@ -142,7 +150,7 @@ const rootMutation = new GraphQLObjectType({
           args.password = await bcrypt.hash(args.password, salt);
         }
 
-        if(args.photo) {
+        if(args.photo) {          
           const { createReadStream } = await args.photo.file
           const uploadResult = await new Promise((resolve, reject) => {
             const stream = cloudinary.uploader.upload_stream({ folder: 'project-management/user' }, (error, result) => {
@@ -172,9 +180,8 @@ const rootMutation = new GraphQLObjectType({
         publicId: { type: GraphQLString }
        },
       resolve: async (parent, args) => {
-        if(publicId) {
-          await cloudinary.uploader.destroy(publicId)
-        }
+        await Task.deleteMany({userId: args.id});
+        await Project.updateMany({}, {$pull: {membersId: args.id}})
         return User.findByIdAndRemove(args.id);
       },
     },
@@ -275,6 +282,7 @@ const rootMutation = new GraphQLObjectType({
         id: { type: GraphQLID },
        },
       resolve: async (parent, args) => {
+        Task.deleteMany({projectId: args.id})
         return Project.findByIdAndRemove(args.id);
       },
     },
